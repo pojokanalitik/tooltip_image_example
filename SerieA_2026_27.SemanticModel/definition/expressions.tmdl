@@ -1,0 +1,49 @@
+/// Absolute path to the folder holding the four source CSVs.
+/// Set this to the Data folder shipped with this project, then Refresh.
+expression DataFolderPath = "{your folder}\SerieA_2026_27\Data" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 8b2c4d6e-0001-4a11-9c22-d3e4f5a6b701
+
+	annotation PBI_ResultType = Text
+
+/// Returns the lead image of an English Wikipedia article via the REST
+/// summary API, or null if the page has no image or the call fails.
+/// RelativePath keeps the call refresh-safe in the Power BI Service;
+/// try/otherwise means one bad title can never break the whole refresh.
+expression FnWikipediaImage =
+		let
+		    Fn = (title as nullable text) as nullable text =>
+		        if title = null or title = "" then
+		            null
+		        else
+		            let
+		                Payload = try Json.Document(
+		                        Web.Contents(
+		                            "https://en.wikipedia.org",
+		                            [
+		                                RelativePath = "api/rest_v1/page/summary/"
+		                                               & Uri.EscapeDataString(title),
+		                                Headers = [
+		                                    #"Api-User-Agent" = "SerieA-PowerBI-Demo/1.0",
+		                                    #"Accept"         = "application/json"
+		                                ]
+		                            ]
+		                        )
+		                    ) otherwise null,
+		                Thumb =
+		                    if Payload = null then
+		                        null
+		                    else if not (Payload is record) then
+		                        null
+		                    else if Record.HasFields(Payload, "thumbnail") then
+		                        try Record.FieldOrDefault(Payload[thumbnail], "source", null)
+		                            otherwise null
+		                    else
+		                        null
+		            in
+		                Thumb
+		in
+		    Fn
+	lineageTag: 8b2c4d6e-0002-4a11-9c22-d3e4f5a6b702
+
+	annotation PBI_ResultType = Function
+

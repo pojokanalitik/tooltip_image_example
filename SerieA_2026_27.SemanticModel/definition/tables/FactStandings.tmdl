@@ -1,0 +1,167 @@
+table FactStandings
+	lineageTag: 9c3d5e7f-0003-4b12-ad23-e4f5a6b7c801
+
+	measure 'Total Points' = SUM(FactStandings[Points])
+		formatString: #,0
+		lineageTag: ad4e6f80-0001-4c13-be24-f5a6b7c8d901
+
+	measure 'Matches Played' = SUM(FactStandings[Played])
+		formatString: #,0
+		lineageTag: ad4e6f80-0002-4c13-be24-f5a6b7c8d902
+
+	measure Wins = SUM(FactStandings[Won])
+		formatString: #,0
+		lineageTag: ad4e6f80-0003-4c13-be24-f5a6b7c8d903
+
+	measure Draws = SUM(FactStandings[Drawn])
+		formatString: #,0
+		lineageTag: ad4e6f80-0004-4c13-be24-f5a6b7c8d904
+
+	measure Losses = SUM(FactStandings[Lost])
+		formatString: #,0
+		lineageTag: ad4e6f80-0005-4c13-be24-f5a6b7c8d905
+
+	measure 'Goals For' = SUM(FactStandings[GoalsFor])
+		formatString: #,0
+		lineageTag: ad4e6f80-0006-4c13-be24-f5a6b7c8d906
+
+	measure 'Goals Against' = SUM(FactStandings[GoalsAgainst])
+		formatString: #,0
+		lineageTag: ad4e6f80-0007-4c13-be24-f5a6b7c8d907
+
+	measure 'Goal Difference' = [Goals For] - [Goals Against]
+		formatString: +#,0;-#,0;0
+		lineageTag: ad4e6f80-0008-4c13-be24-f5a6b7c8d908
+
+	/// Clubs have played a different number of matches at this point in
+	/// the season, so points per match is the fair basis for comparison,
+	/// not raw points.
+	measure 'Points per Match' = DIVIDE([Total Points], [Matches Played])
+		formatString: 0.00
+		lineageTag: ad4e6f80-0009-4c13-be24-f5a6b7c8d909
+
+	measure 'Goals For per Match' = DIVIDE([Goals For], [Matches Played])
+		formatString: 0.00
+		lineageTag: ad4e6f80-000a-4c13-be24-f5a6b7c8d90a
+
+	measure 'Goals Against per Match' = DIVIDE([Goals Against], [Matches Played])
+		formatString: 0.00
+		lineageTag: ad4e6f80-000b-4c13-be24-f5a6b7c8d90b
+
+	measure 'Win Rate' = DIVIDE([Wins], [Matches Played])
+		formatString: 0.0 %
+		lineageTag: ad4e6f80-000c-4c13-be24-f5a6b7c8d90c
+
+	/// Extrapolates the current rate across a full 38-match season.
+	measure 'Projected Points (38 Matches)' =
+			IF(
+			    [Matches Played] > 0,
+			    ROUND([Points per Match] * 38, 0)
+			)
+		formatString: #,0
+		lineageTag: ad4e6f80-000d-4c13-be24-f5a6b7c8d90d
+
+	measure 'League Position' = MIN(FactStandings[Position])
+		formatString: 0
+		lineageTag: ad4e6f80-000e-4c13-be24-f5a6b7c8d90e
+
+	/// Keeps the "as of" date on the canvas so nobody reads a 3-match
+	/// table as a finished season.
+	measure 'Data As Of' = "Klasemen per 6 September 2026  ·  sumber: Wikipedia / Lega Serie A"
+		lineageTag: ad4e6f80-000f-4c13-be24-f5a6b7c8d90f
+
+	measure 'Clubs Counted' = DISTINCTCOUNT(FactStandings[ClubKey])
+		formatString: #,0
+		lineageTag: ad4e6f80-0010-4c13-be24-f5a6b7c8d910
+
+	column ClubKey
+		dataType: int64
+		isHidden
+		lineageTag: be5f7091-0001-4d14-cf25-a6b7c8d9ea01
+		summarizeBy: none
+		sourceColumn: ClubKey
+
+	column Position
+		dataType: int64
+		formatString: 0
+		lineageTag: be5f7091-0002-4d14-cf25-a6b7c8d9ea02
+		summarizeBy: none
+		sourceColumn: Position
+
+	column Played
+		dataType: int64
+		isHidden
+		lineageTag: be5f7091-0003-4d14-cf25-a6b7c8d9ea03
+		summarizeBy: sum
+		sourceColumn: Played
+
+	column Won
+		dataType: int64
+		isHidden
+		lineageTag: be5f7091-0004-4d14-cf25-a6b7c8d9ea04
+		summarizeBy: sum
+		sourceColumn: Won
+
+	column Drawn
+		dataType: int64
+		isHidden
+		lineageTag: be5f7091-0005-4d14-cf25-a6b7c8d9ea05
+		summarizeBy: sum
+		sourceColumn: Drawn
+
+	column Lost
+		dataType: int64
+		isHidden
+		lineageTag: be5f7091-0006-4d14-cf25-a6b7c8d9ea06
+		summarizeBy: sum
+		sourceColumn: Lost
+
+	column GoalsFor
+		dataType: int64
+		isHidden
+		lineageTag: be5f7091-0007-4d14-cf25-a6b7c8d9ea07
+		summarizeBy: sum
+		sourceColumn: GoalsFor
+
+	column GoalsAgainst
+		dataType: int64
+		isHidden
+		lineageTag: be5f7091-0008-4d14-cf25-a6b7c8d9ea08
+		summarizeBy: sum
+		sourceColumn: GoalsAgainst
+
+	column Points
+		dataType: int64
+		isHidden
+		lineageTag: be5f7091-0009-4d14-cf25-a6b7c8d9ea09
+		summarizeBy: sum
+		sourceColumn: Points
+
+	partition FactStandings = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(DataFolderPath & "\FactStandings.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(
+				        Promoted,
+				        {
+				            {"ClubKey", Int64.Type},
+				            {"Position", Int64.Type},
+				            {"Played", Int64.Type},
+				            {"Won", Int64.Type},
+				            {"Drawn", Int64.Type},
+				            {"Lost", Int64.Type},
+				            {"GoalsFor", Int64.Type},
+				            {"GoalsAgainst", Int64.Type},
+				            {"Points", Int64.Type}
+				        }
+				    )
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

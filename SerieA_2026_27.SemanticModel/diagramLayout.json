@@ -1,0 +1,74 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 5.3333334922790527
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 334.17941566988611,
+            "y": 212.76878482938963
+          },
+          "nodeIndex": "FactPlayerStat",
+          "nodeLineageTag": "9c3d5e7f-0004-4b12-ad23-e4f5a6b7c801",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 618.37645520037051,
+            "y": 64.871234307171221
+          },
+          "nodeIndex": "DimClub",
+          "nodeLineageTag": "9c3d5e7f-0001-4b12-ad23-e4f5a6b7c801",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 372.08709676544692
+          },
+          "nodeIndex": "DimPlayer",
+          "nodeLineageTag": "9c3d5e7f-0002-4b12-ad23-e4f5a6b7c801",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 902.57687716577948,
+            "y": -50
+          },
+          "nodeIndex": "FactStandings",
+          "nodeLineageTag": "9c3d5e7f-0003-4b12-ad23-e4f5a6b7c801",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

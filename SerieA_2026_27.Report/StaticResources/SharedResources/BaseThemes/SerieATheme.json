@@ -1,0 +1,35 @@
+{
+  "name": "Serie A 2026/27",
+  "dataColors": [
+    "#0B7285",
+    "#12A36A",
+    "#E8A33D",
+    "#D64550",
+    "#6B4FBB",
+    "#118DFF",
+    "#8E1F2F",
+    "#1C64AF",
+    "#592C82",
+    "#12A0D7"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#1F2328",
+  "tableAccent": "#0B7285",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 13,
+      "color": "#1F2328"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#6B7280"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Bold",
+      "fontSize": 28,
+      "color": "#1F2328"
+    }
+  }
+}

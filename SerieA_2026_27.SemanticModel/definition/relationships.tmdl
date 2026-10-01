@@ -1,0 +1,19 @@
+relationship DimClub_FactStandings
+	fromColumn: FactStandings.ClubKey
+	toColumn: DimClub.ClubKey
+
+relationship DimClub_FactPlayerStat
+	fromColumn: FactPlayerStat.ClubKey
+	toColumn: DimClub.ClubKey
+
+relationship AutoDetected_0f7f00c5-145f-4de4-9e67-23f22bbaf557
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: FactPlayerStat.PlayerKey
+	toColumn: DimPlayer.PlayerKey
+
+relationship de381059-8802-10ae-2811-ae6962cda874
+	isActive: false
+	fromColumn: DimPlayer.Club
+	toColumn: DimClub.ClubName
+

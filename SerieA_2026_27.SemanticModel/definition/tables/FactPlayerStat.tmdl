@@ -1,0 +1,117 @@
+table FactPlayerStat
+	lineageTag: 9c3d5e7f-0004-4b12-ad23-e4f5a6b7c801
+
+	measure 'Total Goals' = SUM(FactPlayerStat[Goals])
+		formatString: #,0
+		lineageTag: cf607102-0001-4e15-da26-b7c8d9eafb01
+
+	measure 'Total Clean Sheets' = SUM(FactPlayerStat[CleanSheets])
+		formatString: #,0
+		lineageTag: cf607102-0002-4e15-da26-b7c8d9eafb02
+
+	measure 'Players Listed' = DISTINCTCOUNT(FactPlayerStat[PlayerKey])
+		formatString: #,0
+		lineageTag: cf607102-0003-4e15-da26-b7c8d9eafb03
+
+	/// Tooltip photo. COALESCE means a player whose Wikipedia article has
+	/// no lead image shows a neutral placeholder, never a broken image box.
+	measure 'Player Photo' =
+			COALESCE(
+			    SELECTEDVALUE(DimPlayer[PlayerImageURL]),
+			    "https://ui-avatars.com/api/?name=NA&size=256&background=64748B&color=fff&format=png"
+			)
+		lineageTag: cf607102-0004-4e15-da26-b7c8d9eafb04
+
+	measure 'Player Meta' =
+			VAR Club = SELECTEDVALUE(DimPlayer[Club])
+			VAR Pos = SELECTEDVALUE(DimPlayer[Position])
+			VAR Nat = SELECTEDVALUE(DimPlayer[Nationality])
+			RETURN
+			    IF(
+			        NOT ISBLANK(Pos),
+			        COALESCE(Club, "-") & "  ·  " & Pos & "  ·  " & Nat
+			    )
+		lineageTag: cf607102-0005-4e15-da26-b7c8d9eafb05
+
+	measure 'Club Colour' = COALESCE(SELECTEDVALUE(DimClub[ClubColorHex]), "#64748B")
+		lineageTag: cf607102-0006-4e15-da26-b7c8d9eafb06
+
+	/// Goalkeepers are ranked by clean sheets, everyone else by goals,
+	/// so one tooltip line works for both without showing "0 goals" for a GK.
+	measure 'Headline Stat' =
+			VAR Pos = SELECTEDVALUE(DimPlayer[Position])
+			VAR G = [Total Goals]
+			VAR CS = [Total Clean Sheets]
+			RETURN
+			    IF(
+			        NOT ISBLANK(Pos),
+			        IF(
+			            Pos = "Goalkeeper",
+			            CS & IF(CS = 1, " clean sheet", " clean sheets"),
+			            G & IF(G = 1, " goal", " goals")
+			        )
+			    )
+		lineageTag: cf607102-0007-4e15-da26-b7c8d9eafb07
+
+	measure 'Photo Credit' = "Foto: Wikipedia (CC BY-SA)"
+		lineageTag: cf607102-0008-4e15-da26-b7c8d9eafb08
+
+	measure 'Player Name' = ```
+			
+			    SELECTEDVALUE(DimPlayer[PlayerName])
+			```
+		lineageTag: 8455ad14-1529-4913-aac3-7f2dba05cf60
+
+	column PlayerKey
+		dataType: int64
+		isHidden
+		lineageTag: da718213-0001-4f16-eb27-c8d9eafb0c01
+		summarizeBy: none
+		sourceColumn: PlayerKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ClubKey
+		dataType: int64
+		isHidden
+		lineageTag: da718213-0002-4f16-eb27-c8d9eafb0c02
+		summarizeBy: none
+		sourceColumn: ClubKey
+
+	column Goals
+		dataType: int64
+		isHidden
+		lineageTag: da718213-0003-4f16-eb27-c8d9eafb0c03
+		summarizeBy: sum
+		sourceColumn: Goals
+
+	column CleanSheets
+		dataType: int64
+		isHidden
+		lineageTag: da718213-0004-4f16-eb27-c8d9eafb0c04
+		summarizeBy: sum
+		sourceColumn: CleanSheets
+
+	partition FactPlayerStat = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(DataFolderPath & "\FactPlayerStat.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(
+				        Promoted,
+				        {
+				            {"PlayerKey", Int64.Type},
+				            {"ClubKey", Int64.Type},
+				            {"Goals", Int64.Type},
+				            {"CleanSheets", Int64.Type}
+				        }
+				    )
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

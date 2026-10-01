@@ -1,0 +1,21 @@
+ClubKey,ClubName,City,Stadium,StadiumCapacity,Manager,Captain,ClubColorHex,WikiPage
+1,Roma,Rome,Stadio Olimpico,70634,Gian Piero Gasperini,Bryan Cristante,#8E1F2F,AS_Roma
+2,Inter Milan,Milan,Stadio Giuseppe Meazza,75710,Cristian Chivu,Lautaro Martínez,#0068A8,Inter_Milan
+3,Como,Como,Stadio Giuseppe Sinigaglia,13602,Cesc Fàbregas,Lucas Da Cunha,#0B3C8C,Como_1907
+4,Frosinone,Frosinone,Stadio Benito Stirpe,16227,Massimiliano Alvini,Ilario Monterisi,#F5C400,Frosinone_Calcio
+5,AC Milan,Milan,San Siro,75710,Rúben Amorim,Mike Maignan,#FB090B,AC_Milan
+6,Juventus,Turin,Allianz Stadium,41507,Luciano Spalletti,Manuel Locatelli,#1C1C1C,Juventus_FC
+7,Lazio,Rome,Stadio Olimpico,70634,Gennaro Gattuso,Mattia Zaccagni,#87D8F7,SS_Lazio
+8,Atalanta,Bergamo,New Balance Arena,23439,Maurizio Sarri,Éderson,#1C64AF,Atalanta_BC
+9,Udinese,Udine,Bluenergy Stadium,25132,Kosta Runjaić,Jesper Karlström,#2B2B2B,Udinese_Calcio
+10,Sassuolo,Reggio Emilia,Mapei Stadium,21515,Alberto Aquilani,Domenico Berardi,#00A752,US_Sassuolo_Calcio
+11,Napoli,Naples,Stadio Diego Armando Maradona,54732,Massimiliano Allegri,Giovanni Di Lorenzo,#12A0D7,SSC_Napoli
+12,Cagliari,Cagliari,Unipol Domus,16416,Fabio Pisacane,Alessandro Deiola,#A50E32,Cagliari_Calcio
+13,Torino,Turin,Stadio Olimpico Grande Torino,28177,Ignazio Abate,Duván Zapata,#8B1A1A,Torino_FC
+14,Lecce,Lecce,Stadio Via del Mare,30354,Eusebio Di Francesco,Wladimiro Falcone,#FFD100,US_Lecce
+15,Bologna,Bologna,Stadio Renato Dall'Ara,38279,Domenico Tedesco,Lorenzo De Silvestri,#A21C25,Bologna_FC_1909
+16,Parma,Parma,Stadio Ennio Tardini,22352,Carlos Cuesta,Enrico Delprato,#F5D000,Parma_Calcio_1913
+17,Monza,Monza,Stadio Brianteo,17102,Ivan Jurić,Matteo Pessina,#E30613,AC_Monza
+18,Venezia,Venice,Stadio Pier Luigi Penzo,12048,Giovanni Stroppa,Gianluca Busio,#F58220,Venezia_FC
+19,Genoa,Genoa,Stadio Luigi Ferraris,33205,Daniele De Rossi,Johan Vásquez,#B02026,Genoa_CFC
+20,Fiorentina,Florence,Stadio Artemio Franchi,43118,Fabio Grosso,David De Gea,#592C82,ACF_Fiorentina

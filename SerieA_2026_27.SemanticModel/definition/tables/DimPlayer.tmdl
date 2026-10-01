@@ -1,0 +1,160 @@
+table DimPlayer
+	lineageTag: 9c3d5e7f-0002-4b12-ad23-e4f5a6b7c801
+
+	/// Built in Power Query, not DAX. A calculated column that reads
+	/// [Position] cannot also be its sortByColumn - that is circular.
+	column PositionSort
+		dataType: int64
+		isHidden
+		lineageTag: 9c3d5e7f-0002-4b12-ad23-e4f5a6b7c805
+		summarizeBy: sum
+		sourceColumn: PositionSort
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Lead photo from the player's Wikipedia article, resolved at refresh.
+	/// dataCategory: ImageUrl is what makes it render as a picture instead
+	/// of as the raw text of the link.
+	column PlayerImageURL
+		dataType: string
+		lineageTag: 9c3d5e7f-0002-4b12-ad23-e4f5a6b7c808
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: PlayerImageURL
+
+	/// Attribution link. Wikipedia photos are mostly CC BY-SA, which
+	/// requires crediting the source when the image is republished.
+	column WikiArticleURL
+		dataType: string
+		lineageTag: 9c3d5e7f-0002-4b12-ad23-e4f5a6b7c809
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: WikiArticleURL
+
+	column PlayerKey
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9057378f-f627-4885-a66a-5b77d809adff
+		summarizeBy: none
+		sourceColumn: PlayerKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column PlayerName
+		dataType: string
+		lineageTag: 77b3b561-8483-4f67-8acb-ed8c9622e1bf
+		summarizeBy: none
+		sourceColumn: PlayerName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Club
+		dataType: string
+		lineageTag: 684e9828-ac72-4600-9ba4-4d09b45402c2
+		summarizeBy: none
+		sourceColumn: Club
+
+		annotation SummarizationSetBy = Automatic
+
+	column Position
+		dataType: string
+		lineageTag: 77d5f10e-99ea-4350-b263-40740c6ed977
+		summarizeBy: none
+		sourceColumn: Position
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nationality
+		dataType: string
+		lineageTag: 9e5b6695-3045-43a1-9c81-5cdb9e2c627d
+		summarizeBy: none
+		sourceColumn: Nationality
+
+		annotation SummarizationSetBy = Automatic
+
+	column WikiPage
+		dataType: string
+		lineageTag: c4735900-fad5-49f5-8ecd-e5a1c9cddf35
+		summarizeBy: none
+		sourceColumn: WikiPage
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimPlayer = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(DataFolderPath & "\DimPlayer.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true])
+				    // Typed = Table.TransformColumnTypes(
+				    //     Promoted,
+				    //     {
+				    //         {"PlayerKey", Int64.Type},
+				    //         {"PlayerName", type text},
+				    //         {"Club", type text},
+				    //         {"Position", type text},
+				    //         {"Nationality", type text},
+				    //         {"WikiPage", type text}
+				    //     }
+				    // ),
+				    // WithSort = Table.AddColumn(
+				    //     Typed,
+				    //     "PositionSort",
+				    //     each
+				    //         if [Position] = "Goalkeeper" then 1
+				    //         else if [Position] = "Defender" then 2
+				    //         else if [Position] = "Midfielder" then 3
+				    //         else if [Position] = "Forward" then 4
+				    //         else 99,
+				    //     Int64.Type
+				    // ),
+				    // WithImage = Table.AddColumn(
+				    //     WithSort,
+				    //     "PlayerImageURL",
+				    //     each FnWikipediaImage([WikiPage]),
+				    //     type nullable text
+				    // ),
+				    // WithLink = Table.AddColumn(
+				    //     WithImage,
+				    //     "WikiArticleURL",
+				    //     each "https://en.wikipedia.org/wiki/" & [WikiPage],
+				    //     type text
+				    // )
+				  ,
+				  #"Split column by delimiter" = Table.SplitColumn(Promoted, "PlayerKey;PlayerName;Club;Position;Nationality;WikiPage", Splitter.SplitTextByDelimiter(";"), {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.1", "PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.2", "PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.3", "PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.4", "PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.5", "PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.6"}),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Split column by delimiter", {{"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.1", Int64.Type}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.2", type text}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.3", type text}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.4", type text}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.5", type text}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.6", type text}}),
+				  #"Renamed columns" = Table.RenameColumns(#"Changed column type", {{"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.1", "PlayerKey"}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.2", "PlayerName"}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.3", "Club"}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.4", "Position"}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.5", "Nationality"}, {"PlayerKey;PlayerName;Club;Position;Nationality;WikiPage.6", "WikiPage"}}),
+				    WithSort = Table.AddColumn(
+				        #"Renamed columns",
+				        "PositionSort",
+				        each
+				            if [Position] = "Goalkeeper" then 1
+				            else if [Position] = "Defender" then 2
+				            else if [Position] = "Midfielder" then 3
+				            else if [Position] = "Forward" then 4
+				            else 99,
+				        Int64.Type
+				    ),
+				    WithImage = Table.AddColumn(
+				        WithSort,
+				        "PlayerImageURL",
+				        each FnWikipediaImage([WikiPage]),
+				        type nullable text
+				    ),
+				    WithLink = Table.AddColumn(
+				        WithImage,
+				        "WikiArticleURL",
+				        each "https://en.wikipedia.org/wiki/" & [WikiPage],
+				        type text
+				    )
+				in
+				    WithLink
+
+	annotation PBI_ResultType = Table
+

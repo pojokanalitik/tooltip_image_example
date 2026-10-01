@@ -1,0 +1,108 @@
+table DimClub
+	lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c801
+
+	column ClubKey
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c802
+		summarizeBy: none
+		sourceColumn: ClubKey
+
+	column ClubName
+		dataType: string
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c803
+		summarizeBy: none
+		sourceColumn: ClubName
+
+	column City
+		dataType: string
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c804
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+	column Stadium
+		dataType: string
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c805
+		summarizeBy: none
+		sourceColumn: Stadium
+
+	column StadiumCapacity
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c806
+		summarizeBy: sum
+		sourceColumn: StadiumCapacity
+
+		annotation SummarizationSetBy = Automatic
+
+	column Manager
+		dataType: string
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c807
+		summarizeBy: none
+		sourceColumn: Manager
+
+	column Captain
+		dataType: string
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c808
+		summarizeBy: none
+		sourceColumn: Captain
+
+	/// Drives the club-colour strip on the tooltip header.
+	column ClubColorHex
+		dataType: string
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c809
+		summarizeBy: none
+		sourceColumn: ClubColorHex
+
+	/// English Wikipedia article title, used to fetch the club crest.
+	column WikiPage
+		dataType: string
+		isHidden
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c80a
+		summarizeBy: none
+		sourceColumn: WikiPage
+
+	/// Club crest pulled from the Wikipedia article at refresh time.
+	column ClubImageURL
+		dataType: string
+		lineageTag: 9c3d5e7f-0001-4b12-ad23-e4f5a6b7c80b
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: ClubImageURL
+
+	partition DimClub = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(
+				        File.Contents(DataFolderPath & "\DimClub.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(
+				        Promoted,
+				        {
+				            {"ClubKey", Int64.Type},
+				            {"ClubName", type text},
+				            {"City", type text},
+				            {"Stadium", type text},
+				            {"StadiumCapacity", Int64.Type},
+				            {"Manager", type text},
+				            {"Captain", type text},
+				            {"ClubColorHex", type text},
+				            {"WikiPage", type text}
+				        }
+				    ),
+				    WithImage = Table.AddColumn(
+				        Typed,
+				        "ClubImageURL",
+				        each FnWikipediaImage([WikiPage]),
+				        type nullable text
+				    )
+				in
+				    WithImage
+
+	annotation PBI_ResultType = Table
+
